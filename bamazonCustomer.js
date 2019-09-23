@@ -5,7 +5,7 @@ var inquirer = require("inquirer");
 var connection = mysql.createConnection({
   host     : 'localhost',
   user     : 'root',
-  password : 'password',
+  password : 'tJvnjAtbMWtqW9HmmZBDGiZk',
   database : 'bamazon',
   port : 3306
 });
@@ -21,12 +21,6 @@ function showAllItems() {
   });
 }
 //select the item_id, product_name, and price columns of the product table based off of ID
-function SelectItemByID(id) { 
-  connection.query('SELECT item_id, product_name, price,stock_quantity FROM product WHERE item_id = ?',[id], function (error,results,fields) {
-    if (error) throw error;
-    console.log(results);
-  });
-}
 
 // update query based off of id
 function UpdateQuantityofProduct(id,quantity) { 
@@ -42,16 +36,21 @@ function whatDoWantToBuyByID() {
     {type: "input",message: "What is the product id you would like to buy? ",name: "user_item_id"},
     {type: "input",message: "How many would you like  to buy ? ",name: "user_item_quantity"},
   ];
-
+  
   inquirer
   .prompt(questions)
   .then(function(response) {
     var user_item_id = response.user_item_id;
     var user_item_quantity = response.user_item_quantity;
-
-    UpdateQuantityofProduct(user_item_id,user_item_quantity);
+    console.log(response);
     SelectItemByID(user_item_id);
-    // SelectItemByID(response.user_item_id);
+  });
+}
+
+function SelectItemByID(id,quantity) { 
+  connection.query('SELECT item_id, product_name, price,stock_quantity FROM product WHERE item_id = ?',[id], function (error,results,fields) {
+    if (error) throw error;
+    console.log(results[0]);
   });
 }
 
