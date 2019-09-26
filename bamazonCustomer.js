@@ -13,27 +13,24 @@ var connection = mysql.createConnection({
 connection.connect(function(err){
   if (err) throw err;
 
-  showAllItems();
-  whatDoWantToBuyByID()
+  ShowAllProduct();
+  buyProduct();
 });
 
 // select everything from tables
 
-function showAllItems() { 
+function ShowAllProduct() { 
   connection.query('SELECT item_id, product_name, price FROM product', function (error,results,fields) {
     if (error) throw error;
-
-    for(let i = 0; i<results.length; i++){
-      console.log("Product Name: " + results[i].product_name);
-      console.log("Product ID Number: " + results[i].item_id);
-    }
-  });
+    console.table(results);
+  }
+  );
 }
-
-function whatDoWantToBuyByID() {
+//main function. Here we use inquirer to
+function buyProduct() {
   var questions = [
     {type: "input",message: "What is the product id you would like to buy? ",name: "user_item_id"},
-    {type: "input",message: "How many would you like  to buy ? ",name: "user_item_quantity"},
+    {type: "input",message: "How many would you like to buy ? ",name: "user_item_quantity"}
   ];
   
   inquirer
@@ -45,15 +42,18 @@ function whatDoWantToBuyByID() {
 
     connection.query('SELECT item_id, product_name, price,stock_quantity FROM product WHERE item_id = ?',[user_item_id], function(error,results,fields) {
 
-      // console.log(results);
+      
       var product_quantity = results[0].stock_quantity;
       var product_price = results[0].price;
-      var total_price = product_price*user_item_quantity;
+      var total_price = product_price* user_item_quantity;
       var new_quantity = product_quantity - user_item_quantity;
+      var user_item_id_parse = parseInt(response.user_item_id);
       
-      if (product_quantity > user_item_quantity) {
-        connection.query("UPDATE product SET stock_quantity = ? WHERE item_id = ?",[new_quantity,response.user_item_id],function (err,results){
+      if (user_item_quantity <= product_quantity){
+        
+        connection.query("UPDATE product SET stock_quantity = ? WHERE item_id = ?",[new_quantity,user_item_id_parse],function (err,results){
           console.log("The total price of purchase is "+ total_price);
+          console.log("New Quantity of the product left "+ new_quantity);
         })
       } else {
         console.log("Insufficient quantity!")
@@ -63,5 +63,4 @@ function whatDoWantToBuyByID() {
     connection.end();
   });
 }
-// connection.end();
 
